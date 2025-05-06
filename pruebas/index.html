@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensaje Importante</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #2196F3, #4CAF50);
+            font-family: Arial, sans-serif;
+            transition: background 1s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        .fondo-tenerife::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Tenerife_Satellite.png/512px-Tenerife_Satellite.png') center/cover no-repeat;
+            z-index: 0;
+            opacity: 1;
+            pointer-events: none;
+        }
+        .mensaje {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            z-index: 2;
+        }
+        .mensaje:hover {
+            transform: scale(1.05);
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .mensaje-oculto {
+            display: none;
+            animation: aparecer 1s ease-out;
+        }
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .avion-emoji {
+            position: absolute;
+            font-size: 2.5rem;
+            top: 0;
+            left: -3rem;
+            z-index: 1;
+            opacity: 0.85;
+            pointer-events: none;
+            animation: volar 6s linear infinite;
+        }
+        .avion-emoji:nth-child(1) { top: 20%; animation-delay: 0s; }
+        .avion-emoji:nth-child(2) { top: 40%; animation-delay: 2s; }
+        .avion-emoji:nth-child(3) { top: 60%; animation-delay: 4s; }
+        .avion-emoji:nth-child(4) { top: 80%; animation-delay: 1s; }
+        @keyframes volar {
+            0% { left: -3rem; transform: rotate(10deg) scale(1); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100vw; transform: rotate(-10deg) scale(1.1); }
+        }
+        .texto-movible {
+            position: fixed;
+            left: 0;
+            top: 0;
+            font-size: 4rem;
+            color: #222;
+            z-index: 10;
+            transition: transform 1s cubic-bezier(.68,-0.55,.27,1.55);
+            pointer-events: none;
+            user-select: none;
+            will-change: transform;
+        }
+    </style>
+</head>
+<body>
+    <div class="mensaje" id="mensaje-container" onclick="mostrarMensaje()">
+        <h1 id="texto-inicial">Nuria pulsa aquí</h1>
+        <h1 id="texto-final" class="mensaje-oculto">¡Compra los vuelos!</h1>
+    </div>
+    <div id="aviones"></div>
+    <script>
+        let intervaloMovimiento;
+        let primerMovimiento = true;
+        function mostrarMensaje() {
+            document.body.classList.add('fondo-tenerife');
+            document.getElementById('texto-inicial').style.display = 'none';
+            const textoFinal = document.getElementById('texto-final');
+            textoFinal.style.display = 'block';
+            textoFinal.classList.add('texto-movible');
+            crearAviones();
+            // Ocultar el fondo del mensaje para que solo quede el texto flotante
+            document.getElementById('mensaje-container').style.background = 'none';
+            document.getElementById('mensaje-container').style.boxShadow = 'none';
+            document.getElementById('mensaje-container').style.pointerEvents = 'none';
+            // Movimiento aleatorio
+            primerMovimiento = true;
+            moverTextoAleatorio();
+            intervaloMovimiento = setInterval(moverTextoAleatorio, 1200);
+        }
+        function moverTextoAleatorio() {
+            const texto = document.getElementById('texto-final');
+            const escala = 1.5 + Math.random();
+            // Medir el tamaño real tras el escalado
+            texto.style.transform = `scale(${escala})`;
+            texto.style.left = '0px';
+            texto.style.top = '0px';
+            // Esperar a que el navegador calcule el tamaño
+            setTimeout(() => {
+                const ancho = texto.offsetWidth;
+                const alto = texto.offsetHeight;
+                const maxX = window.innerWidth - ancho;
+                const maxY = window.innerHeight - alto;
+                let x, y;
+                if (primerMovimiento) {
+                    // Centrado perfecto al inicio
+                    x = maxX / 2;
+                    y = maxY / 2;
+                    primerMovimiento = false;
+                } else {
+                    x = Math.random() * maxX;
+                    y = Math.random() * maxY;
+                }
+                texto.style.transform = `translate(${x}px, ${y}px) scale(${escala})`;
+            }, 10);
+        }
+        function crearAviones() {
+            const avionesDiv = document.getElementById('aviones');
+            avionesDiv.innerHTML = '';
+            for(let i = 1; i <= 4; i++) {
+                const avion = document.createElement('span');
+                avion.className = 'avion-emoji';
+                avion.innerText = '✈️';
+                avion.style.animationDelay = (i * 1.5) + 's';
+                avionesDiv.appendChild(avion);
+            }
+        }
+    </script>
+</body>
+</html> 
